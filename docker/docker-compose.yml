@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      # 빌드 컨텍스트는 프로젝트 루트 (소스 전체 필요)
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        # 배포 환경의 API 주소로 변경하세요. .env 파일로도 주입 가능합니다.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+    image: gaon-climate-web:latest
+    container_name: gaon-climate-web
+    ports:
+      # 서버(호스트) 28080 -> 컨테이너 80
+      - "28080:80"
+    restart: unless-stopped
