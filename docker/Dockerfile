@@ -30,7 +30,9 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
+# localhost는 ::1(IPv6)로 먼저 해석될 수 있으나 nginx는 IPv4(listen 80)만 듣는다.
+# IPv6 거부로 헬스체크가 실패하지 않도록 127.0.0.1로 고정한다.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1
+  CMD wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
