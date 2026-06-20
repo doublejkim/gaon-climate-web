@@ -13,14 +13,29 @@ Vite + Vue 3 SPA를 빌드해 nginx로 서빙합니다.
 
 `docker/` 폴더에서 실행합니다.
 
+### 1. `.env` 파일 준비 (권장)
+
+compose 는 같은 디렉토리의 `.env` 를 자동으로 읽어 빌드 인자로 치환합니다.
+
 ```bash
 cd docker
+cp .env.example .env
+# .env 를 열어 VITE_API_BASE_URL 을 배포 환경 주소로 수정
+```
 
-# API 주소를 배포 환경에 맞게 지정 (선택). Vite 환경변수는 빌드 시점에 인라인됩니다.
-export VITE_API_BASE_URL=https://api.example.com
+> `docker/.env` 는 git 에 커밋되지 않습니다(`.gitignore` 처리됨). 환경별 값은 서버에서 직접 관리하세요.
+> Vite 환경변수는 빌드 시점에 정적 파일로 인라인됩니다.
 
-# 빌드 + 백그라운드 실행
+### 2. 빌드 + 실행
+
+```bash
 docker compose up -d --build
+```
+
+`.env` 없이 한 번만 직접 지정하려면 환경변수로도 가능합니다.
+
+```bash
+VITE_API_BASE_URL=https://api.example.com docker compose up -d --build
 ```
 
 접속: `http://<서버주소>:28080`
