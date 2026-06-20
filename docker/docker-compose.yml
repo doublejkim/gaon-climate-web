@@ -1,15 +1,27 @@
 services:
-  web:
+  gaon-climate-web:
     build:
       # 빌드 컨텍스트는 프로젝트 루트 (소스 전체 필요)
       context: ..
       dockerfile: docker/Dockerfile
       args:
-        # 배포 환경의 API 주소로 변경하세요. .env 파일로도 주입 가능합니다.
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+        # 브라우저가 호출할 백엔드의 "공개" 주소. docker 내부 호스트명(X).
+        # 값이 없으면 빌드를 막아 localhost 기본값이 박히는 사고를 방지한다.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:?docker/.env에 VITE_API_BASE_URL을 설정하세요}
     image: gaon-climate-web:latest
     container_name: gaon-climate-web
-    ports:
-      # 서버(호스트) 28080 -> 컨테이너 80
-      - "28080:80"
     restart: unless-stopped
+    # Traefik과 공유하는 외부 프록시 네트워크로만 연결 (호스트 포트 직접 노출 안 함)
+    networks:
+      - proxy-net
+    labels:
+      - "traefik.enable=true"
+      # 도메인은 docker/.env의 WEB_DOMAIN에서 주입 (실도메인 노출 방지). 변경 시 재빌드 불필요, up -d만.
+      - "traefik.http.routers.climate-web.rule=Host(`${WEB_DOMAIN:?docker/.env에 WEB_DOMAIN을 설정하세요}`)"
+      - "traefik.http.routers.climate-web.entrypoints=web"
+      # nginx가 컨테이너 80포트로 정적 파일을 서빙한다 (Dockerfile EXPOSE 80)
+      - "traefik.http.services.climate-web.loadbalancer.server.port=80"
+
+networks:
+  proxy-net:
+    external: true
