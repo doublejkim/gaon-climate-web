@@ -2,17 +2,28 @@
   <div class="devices-page">
     <div class="page-header">
       <h2><i class="pi pi-tablet" /> 내 디바이스</h2>
-      <Button
-        icon="pi pi-refresh"
-        label="새로고침"
-        outlined
-        size="small"
-        :loading="loading"
-        @click="fetchDevices"
-      />
+      <div class="header-actions">
+        <Button
+          icon="pi pi-refresh"
+          label="새로고침"
+          outlined
+          size="small"
+          :loading="loading"
+          @click="fetchDevices"
+        />
+        <Button
+          icon="pi pi-plus"
+          label="디바이스 등록"
+          size="small"
+          @click="registerDevice"
+        />
+      </div>
     </div>
 
     <Message v-if="errorMessage" severity="error" :closable="false">{{ errorMessage }}</Message>
+    <Message v-if="registerNotice" severity="info" @close="registerNotice = false">
+      디바이스 등록 기능은 준비 중입니다.
+    </Message>
 
     <div v-if="loading && devices.length === 0" class="skeleton-grid">
       <Skeleton v-for="i in 3" :key="i" height="120px" border-radius="12px" />
@@ -23,22 +34,24 @@
       <p>등록된 디바이스가 없습니다.</p>
     </div>
 
-    <div v-else class="device-grid">
-      <div
-        v-for="device in devices"
-        :key="device.id"
-        class="device-card"
-        @click="router.push(`/devices/${device.id}`)"
-      >
-        <div class="device-card-top">
-          <i class="pi pi-microchip device-icon" />
-          <Tag :value="device.status" :severity="statusSeverity(device.status)" />
+    <div v-else class="device-scroll">
+      <div class="device-grid">
+        <div
+          v-for="device in devices"
+          :key="device.id"
+          class="device-card"
+          @click="router.push(`/devices/${device.id}`)"
+        >
+          <div class="device-card-top">
+            <i class="pi pi-microchip device-icon" />
+            <Tag :value="device.status" :severity="statusSeverity(device.status)" />
+          </div>
+          <div class="device-name">{{ device.name }}</div>
+          <div v-if="device.location_name" class="device-location">
+            <i class="pi pi-map-marker" /> {{ device.location_name }}
+          </div>
+          <div class="device-date">등록일: {{ formatDate(device.created_at) }}</div>
         </div>
-        <div class="device-name">{{ device.name }}</div>
-        <div v-if="device.location_name" class="device-location">
-          <i class="pi pi-map-marker" /> {{ device.location_name }}
-        </div>
-        <div class="device-date">등록일: {{ formatDate(device.created_at) }}</div>
       </div>
     </div>
   </div>
@@ -57,6 +70,7 @@ const router = useRouter()
 const devices = ref<UserDevice[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
+const registerNotice = ref(false)
 
 async function fetchDevices() {
   loading.value = true
@@ -69,6 +83,12 @@ async function fetchDevices() {
   } finally {
     loading.value = false
   }
+}
+
+// TODO: 디바이스 등록 화면/플로우는 아직 미정의. 스펙(2.2)은 버튼 "표시"만 요구.
+//       백엔드 POST /devices/register 가 있으므로, 등록 폼이 정해지면 연결 예정.
+function registerDevice() {
+  registerNotice.value = true
 }
 
 function statusSeverity(status: string) {
@@ -106,6 +126,18 @@ onMounted(fetchDevices)
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* 디바이스 목록은 영역 내에서 스크롤 */
+.device-scroll {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 .skeleton-grid,
