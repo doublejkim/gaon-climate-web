@@ -117,6 +117,12 @@ export interface DeviceMeasurement {
   measured_at: string
 }
 
+export interface ClaimCodeResponse {
+  claim_code: string
+  // 발급 시점 기준 남은 유효시간(초)
+  expires_in: number
+}
+
 export const authApi = {
   signUp: (data: SignUpRequest) => api.post('/users/sign-up', data),
   login: (data: LoginRequest) => api.post<LoginResponse>('/users/login', data),
@@ -126,4 +132,5 @@ export const deviceApi = {
   getDevices: () => api.get<UserDevice[]>('/users/me/devices'),
   getLatestMeasurement: (deviceId: number) =>
     api.get<DeviceMeasurement>(`/users/me/devices/${deviceId}/latest-measurement`),
+  issueClaimCode: () => api.post<ClaimCodeResponse>('/devices/claim-codes'),
 }
