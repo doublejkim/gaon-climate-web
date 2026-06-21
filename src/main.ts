@@ -16,6 +16,9 @@ import '@fontsource/noto-sans-kr/500.css'
 import '@fontsource/noto-sans-kr/600.css'
 import '@fontsource/noto-sans-kr/700.css'
 
+// 위 @font-face들을 실제로 body에 적용하는 전역 스타일 (반드시 로드되어야 함)
+import './assets/global.css'
+
 import App from './App.vue'
 import router from './router'
 

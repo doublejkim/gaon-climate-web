@@ -1,0 +1,21 @@
+/*
+ * 전역 폰트 설정. main.ts에서 import되어 실제로 로드된다.
+ * (기존 main.css/base.css는 어디서도 import되지 않는 Vue 스캐폴드 잔재라 사용하지 않음)
+ *
+ * 영문은 Inter, 한글은 Noto Sans KR(Inter에 한글 글리프 없음)로 통일.
+ * 두 폰트 모두 @fontsource로 self-host 되어 모든 브라우저에서 동일하게 렌더링된다.
+ */
+body {
+  margin: 0;
+  font-family:
+    Inter,
+    'Noto Sans KR',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
