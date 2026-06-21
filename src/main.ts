@@ -5,6 +5,12 @@ import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
 import 'primeicons/primeicons.css'
 
+// Inter 폰트 self-host (각 css에 font-display: swap 포함). 앱에서 쓰는 weight만 로드.
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
+
 import App from './App.vue'
 import router from './router'
 
