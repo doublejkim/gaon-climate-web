@@ -55,6 +55,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { isAxiosError } from 'axios'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
@@ -77,8 +78,15 @@ async function handleLogin() {
     const res = await authApi.login({ email: email.value, password: password.value })
     auth.setTokens(res.data.access_token, res.data.refresh_token)
     router.replace('/devices')
-  } catch {
-    errorMessage.value = '이메일 또는 비밀번호가 올바르지 않습니다.'
+  } catch (e) {
+    // 403 + ACCOUNT_PENDING 인 경우 서버가 내려준 message 를 그대로 노출한다.
+    // (에러 응답은 인터셉터의 언래핑을 타지 않아 { code, message, data } 형태 유지)
+    const body = isAxiosError(e) ? (e.response?.data as { code?: string; message?: string }) : undefined
+    if (isAxiosError(e) && e.response?.status === 403 && body?.code === 'ACCOUNT_PENDING') {
+      errorMessage.value = body?.message ?? '계정 승인 대기 중입니다.'
+    } else {
+      errorMessage.value = '이메일 또는 비밀번호가 올바르지 않습니다.'
+    }
   } finally {
     loading.value = false
   }
